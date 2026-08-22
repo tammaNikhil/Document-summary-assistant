@@ -80,9 +80,15 @@ export async function POST(req: NextRequest) {
       usedOCR = true;
       try {
         extractedText = await extractTextFromImage(buffer);
-      } catch {
+      } catch (ocrErr) {
+        console.error("OCR error:", ocrErr);
+        const isTimeout = ocrErr instanceof Error && ocrErr.message === "OCR timed out";
         return NextResponse.json(
-          { error: "OCR failed to process this image. Try a clearer or higher-resolution image." },
+          {
+            error: isTimeout
+              ? "OCR took too long to process this image. This can happen intermittently — please try again."
+              : "OCR failed to process this image. Try a clearer or higher-resolution image.",
+          },
           { status: 422 }
         );
       }
