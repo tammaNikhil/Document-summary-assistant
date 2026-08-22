@@ -60,20 +60,22 @@ Plain React state in `app/page.tsx` (no external state library — there's exact
 
 ```
 app/
-  page.tsx                  UI: upload → length selector → result / error / reset
+  page.tsx                   UI: upload → length selector → result / error / reset
   layout.tsx                 metadata + mobile viewport
-  globals.css                 design tokens
+  globals.css                design tokens
   api/summarize/route.ts     the only API endpoint
+
 components/
   UploadArea.tsx             drag-drop + file picker
   LengthSelector.tsx         short / medium / long
   SummaryResult.tsx          summary + highlighted key points
   StatusBanners.tsx          loading + error UI
+
 lib/
-  types.ts                    shared types + config constants
-  extract-pdf.ts               PDF text extraction
-  ocr.ts                       image OCR
-  summarize.ts                  summarization provider abstraction
+  types.ts                   shared types + config constants
+  extract-pdf.ts             PDF text extraction
+  ocr.ts                     image OCR
+  summarize.ts               summarization provider abstraction
 ```
 
 ---
