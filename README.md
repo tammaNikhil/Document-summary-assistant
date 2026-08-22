@@ -3,6 +3,7 @@
 Upload a PDF or image document and get an AI-generated summary — short, medium, or long — plus a list of key points. Built as a single Next.js app: no separate backend, no database, no auth.
 
 **Live URL:** https://document-summary-assistant-sepia-five.vercel.app/
+                                                                           
 **Repo:** https://github.com/tammaNikhil/Document-summary-assistant.git
 
 ---
