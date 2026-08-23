@@ -8,7 +8,7 @@ Upload a PDF or image document and get an AI-generated summary — short, medium
 ---
 
 ## How it works
-<img width="1472" height="1216" alt="image" src="https://github.com/user-attachments/assets/04a39a20-f0f7-4a66-a0ff-3b3493743b41" />
+<img width="1072" height="716" alt="image" src="https://github.com/user-attachments/assets/04a39a20-f0f7-4a66-a0ff-3b3493743b41" />
 
 
 ```
