@@ -121,6 +121,4 @@ Every failure path returns a specific, actionable message rather than a generic 
 
 - **Scanned PDFs are capped at `MAX_SCANNED_PDF_PAGES` pages (10 by default)** — OCR-ing a whole PDF page-by-page is slow, so only the first N pages are rendered and OCR'd; longer documents are summarized on however much was processed, with a note in the UI and downloadable PDF that it was truncated. Raise the constant in `lib/extract-pdf.ts` if you need more (and raise `SCANNED_PDF_OCR_DEADLINE_MS` / `maxDuration` in the API route to match — see the comments there for the time budget this needs to fit in).
 - **Upload size is capped low by default (4MB)** to stay under Vercel's Hobby-tier request body limit (~4.5MB). If you deploy elsewhere or upgrade to Vercel Pro, raise `MAX_FILE_SIZE_MB`.
-- **No persistence** — summaries aren't saved. Refreshing the page clears the result. This is intentional for an assessment-scope MVP; adding storage would mean adding a database, which the brief doesn't call for.
-- **Single OCR language (English)** — Tesseract.js is loaded with the `eng` model only. Other languages would need additional traineddata bundled in. This applies to scanned PDFs too.
-- **No automated test suite** — testing was done manually against the scenarios listed in the original brief (see write-up); given the 8-hour scope, that was prioritized over building test infrastructure.
+
