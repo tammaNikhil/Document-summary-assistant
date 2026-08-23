@@ -34,10 +34,7 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
     );
   });
 
-  // createWorker() itself downloads and initializes language data —
-  // that's the step that actually hangs on a stalled network, not
-  // recognize(). The whole flow needs to race against the timeout,
-  // not just the recognition call.
+  
   const run = async () => {
     const worker = await createWorker("eng", 1, {
       cachePath: "/tmp",
@@ -163,11 +160,7 @@ export async function extractTextFromImages(
         if (workerError) throw workerError;
         results.push({ pageNumber: page.pageNumber, text: (result.data.text || "").trim() });
       } catch (err) {
-        // One bad or slow page shouldn't sink OCR for the rest of a
-        // multi-page document — log it, record an empty page, and
-        // keep going. If workerError got set, the worker is likely in
-        // a bad state for good, but we still let subsequent iterations
-        // attempt recognition rather than assuming the worst.
+        
         console.error(`OCR failed on page ${page.pageNumber}:`, err);
         results.push({ pageNumber: page.pageNumber, text: "" });
       }
