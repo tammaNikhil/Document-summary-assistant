@@ -10,21 +10,10 @@ import {
 } from "@/lib/types";
 
 export const runtime = "nodejs";
-// Scanned PDFs go through per-page OCR (see the "likelyScanned" branch
-// below), which is slow enough that the old 60s budget wasn't enough
-// headroom for anything but a single page. 300s is the maximum function
-// duration Vercel's Hobby plan allows without opting into Fluid
-// Compute's higher tiers, so it's the largest budget available without
-// asking anyone deploying this to upgrade.
+
 export const maxDuration = 300;
 
-// How much of the request's total time budget the OCR loop itself is
-// allowed to consume, once a scanned PDF's page images have been
-// extracted. This leaves the remaining ~90s of the 300s budget for
-// upstream work (reading the upload, the initial text-extraction pass,
-// pulling embedded page images out of the PDF) and downstream work (the
-// summarization call), so a many-page scanned PDF degrades to "OCR'd as
-// much as we had time for" instead of blowing the whole request's timeout.
+
 const SCANNED_PDF_OCR_DEADLINE_MS = 210_000;
 
 function isValidLength(v: unknown): v is SummaryLength {
@@ -38,23 +27,7 @@ function jsonError(message: string, status: number) {
   });
 }
 
-/**
- * Streams newline-delimited JSON progress events rather than a single
- * response, so the client can show "reading your document" vs "writing
- * your summary" as two genuinely distinct, server-driven stages instead
- * of one generic spinner (or a client-side timer guessing at timing).
- *
- * Event shapes, one per line:
- *   {"stage":"extracting"}
- *   {"stage":"ocr","page":<number>,"totalPages":<number>}   (scanned PDFs only, one per page)
- *   {"stage":"summarizing"}
- *   {"stage":"done","result":<SummarizeResponse>}
- *   {"stage":"error","error":"<message>"}
- *
- * Validation failures that happen before any real work starts (bad file
- * type, no file, too large) are returned as plain JSON with a non-OK
- * status instead — no need to open a stream for something instant.
- */
+
 export async function POST(req: NextRequest) {
   let formData: FormData;
   try {
