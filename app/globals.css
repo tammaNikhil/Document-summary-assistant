@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #1b2a4a;
+  --ink-soft: #3a4a6b;
+  --paper: #f3f4ef;
+  --paper-card: #ffffff;
+  --border: #dfe1d8;
+  --muted: #6b7280;
+  --highlighter: #d7e86b;
+  --highlighter-dark: #97ab34;
+  --highlighter-text: #1b2a4a;
+  --accent-bg: #fbfced;
+  --error: #b3402a;
+  --error-bg: #fbeae6;
+
+  --font-serif: Charter, "Iowan Old Style", "Georgia", "Cambria", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Menlo", "Consolas", monospace;
+}
+
+[data-theme="dark"] {
+  --ink: #f2f2f0;
+  --ink-soft: #b8b8b8;
+  --paper: #000000;
+  --paper-card: #0d0d0d;
+  --border: #262626;
+  --muted: #8a8a8a;
+  /* Muted/desaturated instead of neon — the bright light-mode highlighter
+     reads as harsh against true black. Text on it flips to light too. */
+  --highlighter: #4d5a1f;
+  --highlighter-dark: #7c8f2c;
+  --highlighter-text: #f2f2f0;
+  --accent-bg: #191c10;
+  --error: #ff7a63;
+  --error-bg: #26120f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.font-display {
+  font-family: var(--font-serif);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Stacked-paper effect for the upload tray */
+.paper-stack {
+  position: relative;
+}
+.paper-stack::before,
+.paper-stack::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 100%;
+  border-radius: 14px;
+  background: var(--paper-card);
+  border: 1px solid var(--border);
+  z-index: -1;
+}
+.paper-stack::before {
+  top: -6px;
+  opacity: 0.7;
+}
+.paper-stack::after {
+  top: -12px;
+  opacity: 0.4;
+}
+
+/* Highlighter-marker effect for key points.
+   Text color follows --highlighter-text (not --ink), since the
+   highlighter background doesn't track light/dark the same way the
+   rest of the page does — light mode uses a bright mark with dark
+   text, dark mode uses a muted mark with light text. */
+.highlight-mark {
+  background: linear-gradient(104deg, transparent 0%, transparent 2%, var(--highlighter) 2%, var(--highlighter) 96%, transparent 96%);
+  color: var(--highlighter-text);
+  padding: 0.15em 0.3em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(0%);
+  }
+  50% {
+    transform: translateY(calc(100% - 3px));
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.scan-line {
+  animation: scan-line 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line {
+    animation: none;
+  }
+}
