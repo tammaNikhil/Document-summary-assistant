@@ -2,8 +2,7 @@
 
 Upload a PDF or image document and get an AI-generated summary — short, medium, or long — plus a list of key points. Built as a single Next.js app: no separate backend, no database, no auth.
 
-**Live URL:** _add after deploying (see Batch E)_
-**Repo:** _add your GitHub URL here_
+**Live URL:** https://document-summary-assistant-sepia-five.vercel.app/
 
 ---
 
@@ -64,9 +63,9 @@ Plain React state in `app/page.tsx` (no external state library — there's exact
 
 ```
 app/
-  page.tsx                  UI: upload → length selector → result / error / reset
+  page.tsx                   UI: upload → length selector → result / error / reset
   layout.tsx                 metadata + mobile viewport
-  globals.css                 design tokens
+  globals.css                design tokens
   api/summarize/route.ts     the only API endpoint
 components/
   UploadArea.tsx             drag-drop + file picker
@@ -74,10 +73,10 @@ components/
   SummaryResult.tsx          summary + highlighted key points
   StatusBanners.tsx          loading + error UI
 lib/
-  types.ts                    shared types + config constants
-  extract-pdf.ts               PDF text extraction + embedded page-image extraction (for scanned PDFs)
-  ocr.ts                       image OCR (single image, and multi-page for scanned PDFs)
-  summarize.ts                  summarization provider abstraction
+  types.ts                   shared types + config constants
+  extract-pdf.ts             PDF text extraction + embedded page-image extraction (for scanned PDFs)
+  ocr.ts                     image OCR (single image, and multi-page for scanned PDFs)
+  summarize.ts               summarization provider abstraction
 ```
 
 ---
