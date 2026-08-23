@@ -6,7 +6,8 @@ import { LengthSelector } from "@/components/LengthSelector";
 import { SummaryResult } from "@/components/SummaryResult";
 import { LoadingIndicator, ErrorBanner } from "@/components/StatusBanners";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { SummaryLength, SummarizeResponse, ApiErrorResponse } from "@/lib/types";
+import { SummaryLength, SummarizeResponse, ApiErrorResponse, MAX_FILE_SIZE_MB } from "@/lib/types";
+import { friendlyUploadErrorMessage } from "@/lib/error-messages";
 
 type Status = "idle" | "loading" | "success" | "error";
 type LoadingStage = "extracting" | "summarizing";
@@ -48,6 +49,13 @@ export default function Home() {
     setResult(null);
   }
 
+  function handleInvalidFile(message: string) {
+    setFile(null);
+    setResult(null);
+    setError(message);
+    setStatus("error");
+  }
+
   function handleStreamEvent(event: StreamEvent) {
     if (event.stage === "extracting" || event.stage === "summarizing") {
       setLoadingStage(event.stage);
@@ -78,16 +86,20 @@ export default function Home() {
       });
 
       // Validation failures (bad file type, too large, etc.) come back
-      // as a single plain JSON error before any stream is opened.
+      // as a single plain JSON error before any stream is opened. If the
+      // body *isn't* JSON, the request never reached our route handler
+      // at all — it was rejected by the hosting platform itself (e.g. a
+      // payload too large for it to accept) — so fall back to a
+      // status-specific message instead of a raw number.
       if (!res.ok) {
-        let message = `The server returned an error (status ${res.status}). Please try again in a moment.`;
+        let message: string | null = null;
         try {
           const data = (await res.json()) as ApiErrorResponse;
           if (data.error) message = data.error;
         } catch {
-          // keep the default message above
+          // not JSON — infra-level rejection, handled below
         }
-        setError(message);
+        setError(message ?? friendlyUploadErrorMessage(res.status, MAX_FILE_SIZE_MB));
         setStatus("error");
         return;
       }
@@ -167,6 +179,7 @@ export default function Home() {
           <UploadArea
             file={file}
             onFileSelected={handleFileSelected}
+            onInvalidFile={handleInvalidFile}
             onClear={reset}
             disabled={isProcessing}
           />

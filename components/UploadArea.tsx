@@ -2,24 +2,32 @@
 
 import { useCallback, useRef, useState } from "react";
 import { ACCEPTED_MIME_TYPES, MAX_FILE_SIZE_MB } from "@/lib/types";
+import { validateFile } from "@/lib/validate-file";
 
 interface UploadAreaProps {
   file: File | null;
   onFileSelected: (file: File) => void;
+  onInvalidFile: (message: string) => void;
   onClear: () => void;
   disabled?: boolean;
 }
 
-export function UploadArea({ file, onFileSelected, onClear, disabled }: UploadAreaProps) {
+export function UploadArea({ file, onFileSelected, onInvalidFile, onClear, disabled }: UploadAreaProps) {
   const [isDragActive, setIsDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(
     (fileList: FileList | null) => {
       if (!fileList || fileList.length === 0) return;
-      onFileSelected(fileList[0]);
+      const selected = fileList[0];
+      const validationError = validateFile(selected);
+      if (validationError) {
+        onInvalidFile(validationError);
+        return;
+      }
+      onFileSelected(selected);
     },
-    [onFileSelected]
+    [onFileSelected, onInvalidFile]
   );
 
   const handleDrop = useCallback(
@@ -83,7 +91,12 @@ export function UploadArea({ file, onFileSelected, onClear, disabled }: UploadAr
           type="file"
           accept={ACCEPTED_MIME_TYPES.join(",")}
           className="hidden"
-          onChange={(e) => handleFiles(e.target.files)}
+          onChange={(e) => {
+            handleFiles(e.target.files);
+            // Reset so selecting the same file again (e.g. after fixing
+            // nothing and retrying) still fires onChange next time.
+            e.target.value = "";
+          }}
         />
         <p className="font-display text-lg sm:text-xl text-[var(--ink)]">
           Drop a document here, or{" "}
