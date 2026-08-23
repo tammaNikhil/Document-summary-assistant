@@ -8,28 +8,9 @@ Upload a PDF or image document and get an AI-generated summary — short, medium
 
 ## How it works
 
-```
-Browser
-  │  drag/drop or file picker
-  ▼
-POST /api/summarize  (file + length preference)
-  │
-  ├─ PDF?   → pdf-parse extracts text
-  │            │
-  │            └─ text too sparse per page? → likely a scanned PDF —
-  │               pull each page's embedded scan image out directly
-  │               (pdf-parse getImage) and OCR it with Tesseract.js
-  │
-  └─ Image? → Tesseract.js OCR extracts text
-  │
-  ▼
-Extracted text → summarization provider (Groq by default)
-  │
-  ▼
-{ summary, keyPoints[] } → rendered in the UI
-```
+<img width="803" height="728" alt="image" src="https://github.com/user-attachments/assets/8b3c53d6-f21a-4c30-93e9-6f9516ec96ea" />
 
-Everything happens per-request, in memory. Nothing is stored or persisted.
+
 
 ### PDF extraction
 
