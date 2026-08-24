@@ -144,6 +144,58 @@ class AnthropicProvider implements SummarizationProvider {
     return parseModelJson(content);
   }
 }
+class GoogleProvider implements SummarizationProvider {
+  async summarize(
+    text: string,
+    length: SummaryLength
+  ): Promise<SummarizeOutput> {
+    const apiKey = process.env.GOOGLE_API_KEY;
+
+    if (!apiKey) {
+      throw new Error("GOOGLE_API_KEY is not set");
+    }
+
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: buildPrompt(text, length),
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            maxOutputTokens: 1024,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(
+        `Google Gemini API error (${res.status}): ${errText}`
+      );
+    }
+
+    const data = await res.json();
+
+    const content =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    return parseModelJson(content);
+  }
+}
 
 export function getSummarizationProvider(): SummarizationProvider {
   const providerName = (process.env.SUMMARIZATION_PROVIDER || "groq").toLowerCase();
