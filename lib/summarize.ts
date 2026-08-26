@@ -174,7 +174,7 @@ class GoogleProvider implements SummarizationProvider {
             },
           ],
           generationConfig: {
-            maxOutputTokens: 1024,
+            maxOutputTokens: 4096,
             responseMimeType: "application/json",
           },
         }),
@@ -197,6 +197,29 @@ class GoogleProvider implements SummarizationProvider {
   }
 }
 
+class FallbackProvider implements SummarizationProvider {
+  private providers: SummarizationProvider[];
+
+  constructor(providers: SummarizationProvider[]) {
+    this.providers = providers;
+  }
+
+  async summarize(text: string, length: SummaryLength): Promise<SummarizeOutput> {
+    let lastError: unknown = null;
+    
+    for (const provider of this.providers) {
+      try {
+        return await provider.summarize(text, length);
+      } catch (err) {
+        console.warn(`Provider ${provider.constructor.name} failed, falling back...`, err);
+        lastError = err;
+      }
+    }
+    
+    throw lastError;
+  }
+}
+
 export function getSummarizationProvider(): SummarizationProvider {
   const providerName = (process.env.SUMMARIZATION_PROVIDER || "groq").toLowerCase();
   switch (providerName) {
@@ -204,8 +227,10 @@ export function getSummarizationProvider(): SummarizationProvider {
       return new OpenAIProvider();
     case "anthropic":
       return new AnthropicProvider();
+    case "google":
+      return new FallbackProvider([new GoogleProvider(), new GroqProvider()]);
     case "groq":
     default:
-      return new GroqProvider();
+      return new FallbackProvider([new GroqProvider(), new GoogleProvider()]);
   }
 }
